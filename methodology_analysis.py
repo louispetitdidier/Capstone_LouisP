@@ -1,17 +1,12 @@
 """
-==============================================================================
+
 Methodology Analysis Script
-==============================================================================
 Capstone: Discovering Hidden Patterns in E-Commerce Using Clustering
           Techniques - A Case Study on the Olist Brazilian Marketplace
 
 Research Question: How can clustering techniques uncover meaningful customer
                    segments in a real e-commerce marketplace?
 
-Author:  Louis Petitdidier
-Date:    February 2026
-Seed:    42 (reproducibility)
-==============================================================================
 """
 
 import os, sys, warnings, platform
@@ -54,9 +49,7 @@ def save(fig, name):
     plt.close(fig)
     print(f"  [saved] {name}")
 
-# ============================================================================
 # 1. DATA LOADING & MERGING
-# ============================================================================
 print("\n=== 1. DATA LOADING & MERGING ===")
 
 orders    = pd.read_csv(os.path.join(DIR, "olist_orders_dataset.csv"))
@@ -88,9 +81,8 @@ df["delivery_time_days"] = (
 
 print(f"  Merged DataFrame: {df.shape}")
 
-# ============================================================================
 # 2. FEATURE ENGINEERING (RFM + Behavioral)
-# ============================================================================
+
 print("\n=== 2. FEATURE ENGINEERING ===")
 
 ref_date = df["order_purchase_timestamp"].max() + pd.Timedelta(days=1)
@@ -107,9 +99,8 @@ customer_df = df.groupby("customer_unique_id").agg(
 print(f"  Unique customers: {len(customer_df)}")
 print(customer_df.describe().round(2).to_string())
 
-# ============================================================================
 # 3. DATA CLEANING & PREPROCESSING
-# ============================================================================
+
 print("\n=== 3. DATA CLEANING & PREPROCESSING ===")
 
 # Drop NaN
@@ -137,9 +128,8 @@ scaler = StandardScaler()
 X = scaler.fit_transform(customer_df[feat])
 print(f"  Standardized shape: {X.shape}")
 
-# ============================================================================
 # 4. EXPLORATORY DATA ANALYSIS
-# ============================================================================
+
 print("\n=== 4. EDA ===")
 
 # 4a. Distributions
@@ -179,9 +169,8 @@ pp.savefig(os.path.join(FIG, "04_pairplot.png"), bbox_inches="tight")
 plt.close(pp.figure)
 print("  [saved] 04_pairplot.png")
 
-# ============================================================================
 # 5. PCA
-# ============================================================================
+
 print("\n=== 5. PCA ===")
 
 pca_full = PCA(random_state=SEED)
@@ -228,9 +217,8 @@ loadings = pd.DataFrame(pca_full.components_[:n_comp].T,
                          index=feat)
 print(f"  Loadings:\n{loadings.round(3).to_string()}")
 
-# ============================================================================
 # 6. OPTIMAL NUMBER OF CLUSTERS
-# ============================================================================
+
 print("\n=== 6. OPTIMAL K ===")
 
 K_range = range(2, 11)
@@ -264,9 +252,8 @@ save(fig, "08_silhouette_vs_k.png")
 K = best_k
 print(f"  ** Optimal k = {K} **")
 
-# ============================================================================
 # 7. CLUSTERING MODELS
-# ============================================================================
+
 print("\n=== 7. CLUSTERING ===")
 results = {}
 
@@ -421,9 +408,8 @@ fig.colorbar(sc, ax=ax, label="Cluster")
 fig.tight_layout()
 save(fig, "16_deep_clustering.png")
 
-# ============================================================================
 # 8. EVALUATION & COMPARISON
-# ============================================================================
+
 print("\n=== 8. EVALUATION ===")
 
 def evaluate(data, labels, name):
@@ -467,9 +453,8 @@ fig.suptitle("Clustering Method Comparison", fontsize=14, y=1.02)
 fig.tight_layout()
 save(fig, "17_method_comparison.png")
 
-# ============================================================================
 # 9. CLUSTER PROFILING
-# ============================================================================
+
 print("\n=== 9. CLUSTER PROFILING (K-Means) ===")
 
 from scipy.stats import f_oneway, kruskal
@@ -536,9 +521,8 @@ ax.set_title("Cluster Sizes (K-Means)")
 fig.tight_layout()
 save(fig, "19_cluster_sizes.png")
 
-# ============================================================================
 # 10. SEPARATE YEAR ANALYSIS (2018)
-# ============================================================================
+
 print("\n=== 10. SEPARATE YEAR ANALYSIS (2018) ===")
 df_2018 = df[df["order_purchase_timestamp"].dt.year == 2018].copy()
 ref_date_2018 = df_2018["order_purchase_timestamp"].max() + pd.Timedelta(days=1)
@@ -583,9 +567,7 @@ fig.colorbar(sc, ax=ax, label="Cluster")
 fig.tight_layout()
 save(fig, "21_kmeans_2018.png")
 
-# ============================================================================
 # 11. REPRODUCIBILITY
-# ============================================================================
 print("\n=== 10. REPRODUCIBILITY ===")
 import sklearn, scipy
 print(f"  Python:       {platform.python_version()}")
